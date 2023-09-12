@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html>
+
+<style>
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #f2f2f2;
+}
+
+.add-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dropdown-container {
+  position: relative;
+}
+
+.sort-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #f2f2f2;
+  padding: 10px;
+}
+</style>
+
+<body>
+
+<div class="toolbar">
+  <button class="add-button">Добавить</button>
+  <div class="dropdown-container">
+    <button class="sort-button">Сортировка</button>
+    <div class="dropdown-content">
+      <label for="status-sort">Сортировать по статусу:</label>
+      <select id="status-sort">
+        <option value="all">Все</option>
+        <option value="in-progress">В процессе</option>
+        <option value="completed">Завершено</option>
+      </select>
+      <label for="date-sort">Сортировать по дате:</label>
+      <select id="date-sort">
+        <option value="asc">По возрастанию</option>
+        <option value="desc">По убыванию</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- Здесь можно разместить карточки -->
+
+
+<script>
+const addButton = document.querySelector('.add-button');
+const sortButton = document.querySelector('.sort-button');
+const dropdownContent = document.querySelector('.dropdown-content');
+
+// Обработчик события для кнопки "Добавить"
+addButton.addEventListener('click', () => {
+  // Ваш код для добавления карточки
+  console.log('Карточка добавлена!');
+});
+
+// Обработчик события для кнопки сортировки (открытие/закрытие выпадающего списка)
+sortButton.addEventListener('click', () => {
+  dropdownContent.classList.toggle('show');
+});
+
+// Закрываем выпадающий список, если клик был за его пределами
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.dropdown-container')) {
+    dropdownContent.classList.remove('show');
+  }
+});
+</script>
+
+</body>
+
+</html>

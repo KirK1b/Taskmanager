@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" >
+<html>
+ <head>
+ <!-- <link type="image/x-icon" rel="icon" href="images/icon.png"> -->
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="css/style.css" type="text/css" />  
+   <!-- <script src="./routes/cardcreate.js"></script> -->
+  <script src="js/jquery.js"></script>
+  <script src="server.js"></script> 
+ </head>
+ 
+ <body>
+ <!-- Меню сайта -->	
+<nav class="navbar navbar-expand-lg fixed-top ">
+	<div class="collapse navbar-collapse ">
+		<ul class="navbar-nav mr-4">   
+			<div id="title">
+				<a href="mainpage.html"> 
+				<span style="font-size:50px;">Task</span><span style="font-size:43px;">manager</span>
+				</a>
+			</div>		
+		</ul>  
+	</div>
+</nav>
+	
+	<header class="header">
+	
+	</header>
+
+<div class="container-main">
+
+<div class="toolbar">
+  <button id="addbutton" class="add-button">Добавить</button>
+  <!-- кнопка сортировки по дате -->
+  <div class="dropdown">
+    <button class="sort-button" id="databtn" onclick="openContent2()" ><img src="images/dataicon.png" width="20" height="20"></button>
+    <div id="datadropdown"  class="dropdown-content">    
+      <!-- <select id="date-sort"> -->
+        <a value="asc">По возрастанию</a>
+        <a value="desc">По убыванию</a>
+      <!-- </select> -->
+    </div>
+  </div>
+  <!-- кнопка сортировки по статусу -->
+<div class="dropdown">
+    <button class="sort-button" id="statusbtn" onclick="openContent1()"><img src="images/dataicon.png" width="20" height="20"></button>
+    <div id="statdropdown" class="dropdown-content">
+        <button href="#" onclick="touch()">Все</button>
+        <a href="#">В процессе</a>
+        <a href="#">Завершено</a>
+    </div>
+  </div>
+</div>
+
+	<div class="card-list" id="cardList">
+        <div class="card id:0">
+            <span class="card-title">Карточка 1</span>
+            <div class="status-btn"></div>
+        </div>
+        
+        <!-- Добавьте больше карточек при необходимости -->
+    </div>
+	
+	 <div class="task-block">
+        <div class="task-title">Заголовок задачи</div>
+        <div class="task-text">
+            Текст задачи здесь. Может быть длинным и содержать много информации.
+        </div>
+    </div>
+	
+</div>
+
+ </body>
+
+
+<script>
+// Обработчик события для кнопки сортировки (открытие выпадающего списка)
+function openContent1() {
+  document.getElementById("statdropdown").classList.toggle("show");
+  console.log('Открытие списка');
+   event.stopPropagation();
+}
+
+function openContent2() {
+  document.getElementById("datadropdown").classList.toggle("show");
+  console.log('Открытие списка');
+   event.stopPropagation();
+}
+
+function touch(){
+ console.log('зарегистрировано');
+}
+
+window.onclick = function(event) {
+  if (!event.target.matches('.sort-button')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+		console.log('Закрытие списка, курсор за его пределами');
+      }
+    }
+	
+  }
+}
+ 
+</script>
+
+</html>
