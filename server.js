@@ -76,9 +76,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 const addButton = document.querySelector('.add-button');
 // Обработчик события для кнопки "Добавить"
 addButton.addEventListener('click', () => {
-	(function(){
-	
-	fetch('/addTasks', {
+
+fetch('/addTasks', {
 	method:'POST', 
 	headers: {
     	'Content-Type': 'application/json'
@@ -89,30 +88,22 @@ addButton.addEventListener('click', () => {
 	description:"New text of task", 
 	status: "todo"
 		})
-	});
+	}).then(
+	fetch('/getOneTask', {
+			method: 'POST',
+			headers: {
+		    	'Content-Type': 'application/json'
+		  	},
+			body: JSON.stringify({
+			user_id: "1" 
+			})
+			}
+				).then(response => response.json()).then(data => {cardCreate(data)})
+			); 
 	
-	}());
-	
-	(function(){
-	getonetask();
-	}());
-	//.then(
-	//fetch('/getOneTask', {
-	//		method: 'POST',
-	//		headers: {
-	//	    	'Content-Type': 'application/json'
-	//	  	},
-	//		body: JSON.stringify({
-	//		user_id: "1" 
-	//		})
-	//		}
-	//			).then(response => response.json()).then(data => {cardCreate(data)})
-	//		); 
-	//let taskData = response.json(); 
-	//cardCreate(taskData);
 });
   
- 
+  //Выбор карточек для удаления
  const cards = document.querySelectorAll('.card');
  let selectedCards = [];
     // Добавляем обработчик события для каждой карточки

@@ -9,7 +9,7 @@ router.route('/getTasks').get(tasksController.getTasks);
 router.route('/getOneTask').post(tasksController.getOneTask);
 router.route('/addTasks').post(tasksController.addTasks);
 router.route('/rmTasks').delete(tasksController.rmTasks);
-router.route('/multiF').delete(tasksController.multiF);
+//router.route('/multiF').delete(tasksController.multiF);
 
 module.exports = router;
 

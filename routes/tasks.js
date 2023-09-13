@@ -8,6 +8,7 @@ module.exports = (callback) => {
   const sqlQuery = 'SELECT * FROM tasks';
 
   db.query(sqlQuery, (err, result) => {
+  
     if (err) {
       console.error('Ошибка выполнения SQL-запроса:', err);
       callback(err, null);
