@@ -1,5 +1,3 @@
-//клиентская сторона сервера, код как-бы "вставляется" в сайт при подключении этого файла 
-
   function cardCreate(tasksData){
   const cardList = document.getElementById("cardList"); 
   if (cardList) {
@@ -43,6 +41,10 @@
 
 document.addEventListener('DOMContentLoaded', async function() {
 
+/*
+  Получение тасок при загрузке страницы
+*/
+
   try {
     let response = await fetch('/getTasks'); 
     let tasksData = await response.json();
@@ -51,25 +53,49 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.error('Ошибка:', error);
   }
   
+/*
+Тестовая функция для проверки работы buildDynamicSQLQuery
+*/
+ 
+ try{
+ let response = await fetch('/multiF', {
+					method: 'POST',
+					headers: {
+				    	'Content-Type': 'application/json'
+				  	},
+					body: JSON.stringify({
+					user_id: "1",
+					status: "todo"
+					})
+				}
+			);
+	  //let Data = await response.json();
+	  //console.log(Data);
+	  
+ }catch(error){
+ console.error('buildDynamicSQLQuery: ', error);
+ }
+ 
   async function getonetask(){
-  try{
-  console.log('goonetrask');
-  let response = await fetch('/getOneTask', {
-				method: 'POST',
-				headers: {
-			    	'Content-Type': 'application/json'
-			  	},
-				body: JSON.stringify({
-				user_id: "1" 
-				})
-			}
-		);
-  let taskData = await response.json();
-  console.log(taskData);
-  cardCreate(taskData);
-  } catch (error) {
-    console.error('Ошибка:', error);
-  }
+	  try{
+	  console.log('goonetask');
+	  let response = await fetch('/getOneTask', {
+					method: 'POST',
+					headers: {
+				    	'Content-Type': 'application/json'
+				  	},
+					body: JSON.stringify({
+					user_id: "1" 
+					})
+				}
+			);
+	  let taskData = await response.json();
+	  console.log(taskData);
+	  return taskData;
+	  //cardCreate(taskData);
+	  } catch (error) {
+	    console.error('Ошибка:', error);
+	  }
   }  
   
   //часть для кнопки добавления записей
@@ -112,7 +138,13 @@ fetch('/addTasks', {
     //короткое нажатие на карточку
         card.addEventListener('click', () => {
          	getCardId(card);
-            // Дополнительные действия, которые вы хотите выполнить
+            //связываем title и таску через getonetask
+		getonetask();
+		//как получить инфу о таске, по которой кликнули?
+		//вариант 1 - передать в качестве аргумента в функцию getonetask слово "id" и сам этот параметр от функции getCardId
+		//если не нужно передавать какой-то параметр, нужно его указать в виде '', однако нужно сделать проверку на пустоту параметра и если он не пустой, добавлять запятую после него в запросе к бд	
+		//если аргумент отсутствует в передаче аргументов функции, т.е. underfined, то делаем замену undefined на ''
+		//вариант 2 - написать новую функцию для этого (геморрой и бред, и так много всего)
         });
         
         //долгое нажатие на карточку - выбор карточек для удаления
@@ -143,7 +175,7 @@ fetch('/addTasks', {
     	});
      
     });
-        
+//доработать, переместить в блок выше        
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Delete') {
   	if(confirm("Удалить таски?")){
@@ -160,12 +192,41 @@ document.addEventListener('keydown', (event) => {
 		selectedCard.remove();
 		});
         selectedCards = [];
-  	}
-  	
+  	}	
   }
 });
         
+const title = document.querySelector('.task-title');
 
+title.addEventListener("keydown", (event) => {
+if(document.activeElement === title){
+  if (event.key === 'Enter'){
+  var text = title.textContent;
+  console.log(text);
+  title.blur();
+  fetch('/ChangeTitle', {
+			method: 'POST',
+			headers: {
+		    	'Content-Type': 'application/json'
+		  		},
+			body: JSON.stringify({
+			user_id: "1",
+			title: '' 
+				})
+			}
+		);
+ 	}
+  }
+});
+  
+
+  
+  
+//title.addEventListener("focusin", () => {
+//  console.log("focused");
+  //делается проверка существования в classList элемента focused
+  
+//});
         //конец domContentLoaded
 }); 
   

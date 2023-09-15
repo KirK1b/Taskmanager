@@ -69,12 +69,12 @@ class DatabaseHandler {
   }
 
 //WIP
-  static buildDynamicSQLQuery(data) {
-    const keys = Object.keys(data);
-    const values = Object.values(data);
+  static multiF(data) { //buildDynamicSQLQuery
+    let keys = Object.keys(data);
+    let values = Object.values(data);
 
-    let sqlQuery = 'SELECT * FROM table WHERE ';
-    const sqlValues = [];
+    let sqlQuery = 'SELECT * FROM tasks WHERE ';
+    let sqlValues = []; //was const
 
     for (let i = 0; i < keys.length; i++) {
       sqlQuery += `${keys[i]} = ?`;

@@ -38,10 +38,16 @@ class UsersController {
 	
 	//res.json(result);
 	}
-	
+	//WIP
 	multiF(req, res){
+	const result = DatabaseHandler.multiF(req.body);
+	res = result;
+	/*
 	const keys = Object.keys(req.body);
+	const values = Object.values(req.body);
 	console.log(keys);
+	console.log(values);
+	*/
 	}
 }
 
