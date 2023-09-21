@@ -56,24 +56,34 @@ document.addEventListener('DOMContentLoaded', async function() {
 /*
 Тестовая функция для проверки работы buildDynamicSQLQuery
 */
- 
- try{
- let response = await fetch('/multiF', {
-					method: 'POST',
-					headers: {
-				    	'Content-Type': 'application/json'
-				  	},
-					body: JSON.stringify({
-					user_id: "1",
-					status: "todo"
-					})
-				}
-			);
-	  //let Data = await response.json();
-	  //console.log(Data);
-	  
- }catch(error){
- console.error('buildDynamicSQLQuery: ', error);
+ async function multiF(user_id, id, title, description, status){
+	 try{ //через нее и получение данных должно работать
+	 /*if(id === null){
+	 id = "";
+	 }
+	 if(status === null){
+	 status = "todo";
+	 }
+	 */
+	 let response = await fetch('/multiF', {
+						method: 'POST',
+						headers: {
+					    	'Content-Type': 'application/json'
+					  	},
+						body: JSON.stringify({
+						user_id: "1",
+						title: `${title}`,
+						description: `${description}`,
+						status: `${status}`
+						})
+					}
+				);
+		  //let Data = await response.json();
+		  //console.log(Data);
+		  
+	 }catch(error){
+	 console.error('buildDynamicSQLQuery: ', error);
+	 }
  }
  
   async function getonetask(){
@@ -90,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 				}
 			);
 	  let taskData = await response.json();
-	  console.log(taskData);
+	  //console.log(taskData);
 	  return taskData;
 	  //cardCreate(taskData);
 	  } catch (error) {
@@ -137,9 +147,27 @@ fetch('/addTasks', {
     
     //короткое нажатие на карточку
         card.addEventListener('click', () => {
-         	getCardId(card);
-            //связываем title и таску через getonetask
-		getonetask();
+         	//при нажатии в любом случае сначала фетчится таска, потом в нее производится запись
+            	//два фетча: первый для получения таски, второй для записи.
+            	//затем - fetch multiF
+            	const title = card.querySelector('.card-title');
+            	//console.log(title);
+            	fetch('/multiF', {
+			method:'POST', 
+			headers: {
+		    	'Content-Type': 'application/json'
+		  	},
+			body: JSON.stringify({
+			id: getCardId(card) 
+			})
+		}).then(response => response.json()).then(data => {title.textContent = data.title; console.log("DATA: " + data);});//Неработает
+		
+		//card.title.textContent(taskInfo.title);
+		//добавить проверку на изменение таски чтобы не делать лишних fetch
+		//multuF нельзя использовать для обновления тасок(
+		
+		//boolean изменений к каждой таске, чтобы не вызывать бесконечно fetch
+		
 		//как получить инфу о таске, по которой кликнули?
 		//вариант 1 - передать в качестве аргумента в функцию getonetask слово "id" и сам этот параметр от функции getCardId
 		//если не нужно передавать какой-то параметр, нужно его указать в виде '', однако нужно сделать проверку на пустоту параметра и если он не пустой, добавлять запятую после него в запросе к бд	
@@ -204,14 +232,18 @@ if(document.activeElement === title){
   var text = title.textContent;
   console.log(text);
   title.blur();
-  fetch('/ChangeTitle', {
+  //не надо делать в services мультифункцию, нужно просто обращаться по маршруту multiF с нужным набором компонентов fetch
+  fetch('/updateTaskFields', {
 			method: 'POST',
 			headers: {
 		    	'Content-Type': 'application/json'
 		  		},
 			body: JSON.stringify({
 			user_id: "1",
-			title: '' 
+			id: `${getCardId()}`,
+			title: `${text}`
+			//description: `${}`,
+			//status: ``
 				})
 			}
 		);
@@ -220,7 +252,7 @@ if(document.activeElement === title){
 });
   
 
-  
+//а вот функция focused нужна для определния таски, на которую нажали
   
 //title.addEventListener("focusin", () => {
 //  console.log("focused");

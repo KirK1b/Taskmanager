@@ -68,7 +68,7 @@ class DatabaseHandler {
     });
   }
 
-//WIP
+//WIP -  добавть такую же функцию только для перезаписи тасок
   static multiF(data) { //buildDynamicSQLQuery
     let keys = Object.keys(data);
     let values = Object.values(data);
@@ -97,6 +97,44 @@ class DatabaseHandler {
       });
     });
   }
+  
+  static updateTaskFields(taskId, data) {
+  const keys = Object.keys(data);
+  const values = Object.values(data);
+
+  if (keys.length === 0) {
+    return Promise.reject("No fields to update.");
+  }
+
+  let sqlQuery = 'UPDATE tasks SET ';
+  let sqlValues = [];
+
+  for (let i = 0; i < keys.length; i++) {
+    sqlQuery += `${keys[i]} = ?`;
+    sqlValues.push(values[i]);
+
+    if (i < keys.length - 1) {
+      sqlQuery += ', ';
+    }
+  }
+
+  sqlQuery += ' WHERE id = ?'; 
+
+  sqlValues.push(taskId);
+
+  return new Promise((resolve, reject) => {
+    db.query(sqlQuery, sqlValues, (err, results) => {
+      if (err) {
+        console.error("Error executing query:", err);
+        reject(err);
+      } else {
+        console.log("Update results:", results);
+        resolve(results);
+      }
+    });
+  });
+}
+  
 }
 
 module.exports = DatabaseHandler;
