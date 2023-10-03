@@ -91,14 +91,14 @@ class DatabaseHandler {
           console.error("Error executing query:", err);
           reject(err);
         } else {
-          console.log("Query results:", results);
+          //console.log("Query results:", results);
           resolve(results);
         }
       });
     });
   }
   
-  static updateTaskFields(taskId, data) {
+  static uTF(data) { //updateTaskFields
   const keys = Object.keys(data);
   const values = Object.values(data);
 
@@ -110,6 +110,7 @@ class DatabaseHandler {
   let sqlValues = [];
 
   for (let i = 0; i < keys.length; i++) {
+    if(`${keys[i]}` === 'id')i++;
     sqlQuery += `${keys[i]} = ?`;
     sqlValues.push(values[i]);
 
@@ -120,7 +121,7 @@ class DatabaseHandler {
 
   sqlQuery += ' WHERE id = ?'; 
 
-  sqlValues.push(taskId);
+  sqlValues.push(data.id);
 
   return new Promise((resolve, reject) => {
     db.query(sqlQuery, sqlValues, (err, results) => {

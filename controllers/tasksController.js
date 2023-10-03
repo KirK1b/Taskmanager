@@ -19,39 +19,45 @@ class UsersController {
 	}
 	
 	addTasks(req, res){
-	DatabaseHandler.addT(req.body.user_id, req.body.title, req.body.description, req.body.status);
+		DatabaseHandler.addT(req.body.user_id, req.body.title, req.body.description, req.body.status);
 	}
 	
 	rmTasks(req, res){
-	DatabaseHandler.rmT(req.body.id);
+		DatabaseHandler.rmT(req.body.id);
 	}
 	
 	getOneTask(req, res){
-	const result = DatabaseHandler.getOneT(req.body.user_id).then(result => {
+		const result = DatabaseHandler.getOneT(req.body.user_id).then(result => {
 		    //console.log('Результат запроса:', result);
 		    res.json(result);
 		  })
 		  .catch(error => {
 		    console.error('Ошибка:', error);
 		  });
-	
-	
-	//res.json(result);
 	}
 	//WIP
 	multiF(req, res){
-	const result = DatabaseHandler.multiF(req.body);
-	res = result;
-	/*
-	const keys = Object.keys(req.body);
-	const values = Object.values(req.body);
-	console.log(keys);
-	console.log(values);
-	*/
+		DatabaseHandler.multiF(req.body)
+		.then(result => {
+		res.json(result);
+		})
+		.catch(error => {
+		console.error('Ошибка:', error);
+		});
+	}
+	
+	uTF(req, res){
+		DatabaseHandler.uTF(req.body)
+		.then(result => {res.json(result);}).catch(error => {console.error('Ошибка:', error);});
 	}
 }
 
 module.exports = new UsersController();
 
 
-
+/*
+	const keys = Object.keys(req.body);
+	const values = Object.values(req.body);
+	console.log(keys);
+	console.log(values);
+	*/

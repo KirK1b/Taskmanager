@@ -12,6 +12,6 @@ router.route('/rmTasks').delete(tasksController.rmTasks);
 router.route('/ChangeTitle').post();
 //WIP
 router.route('/multiF').post(tasksController.multiF);
-
+router.route('/updateTaskField').post(tasksController.uTF);
 module.exports = router;
 

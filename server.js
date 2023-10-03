@@ -56,15 +56,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 /*
 Тестовая функция для проверки работы buildDynamicSQLQuery
 */
- async function multiF(user_id, id, title, description, status){
+ /*async function multiF(user_id, id, title, description, status){
 	 try{ //через нее и получение данных должно работать
-	 /*if(id === null){
-	 id = "";
+	 if(id === null){
+	 id = "0";
 	 }
 	 if(status === null){
 	 status = "todo";
 	 }
-	 */
+	 
 	 let response = await fetch('/multiF', {
 						method: 'POST',
 						headers: {
@@ -84,9 +84,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 	 }catch(error){
 	 console.error('buildDynamicSQLQuery: ', error);
 	 }
- }
+ } */
  
-  async function getonetask(){
+ /* async function getonetask(){
 	  try{
 	  console.log('goonetask');
 	  let response = await fetch('/getOneTask', {
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	  } catch (error) {
 	    console.error('Ошибка:', error);
 	  }
-  }  
+  }  */
   
   //часть для кнопки добавления записей
 const addButton = document.querySelector('.add-button');
@@ -125,7 +125,7 @@ fetch('/addTasks', {
 	status: "todo"
 		})
 	}).then(
-	fetch('/getOneTask', {
+	fetch('/getOneTask', { //TODO: переписать в multiF, с выборкой по самому позднему времени добавления задачи
 			method: 'POST',
 			headers: {
 		    	'Content-Type': 'application/json'
@@ -149,19 +149,40 @@ fetch('/addTasks', {
         card.addEventListener('click', () => {
          	//при нажатии в любом случае сначала фетчится таска, потом в нее производится запись
             	//два фетча: первый для получения таски, второй для записи.
+            	// 1 - fetch updateTaskFields
             	//затем - fetch multiF
+            	
             	const title = card.querySelector('.card-title');
+            	const textTitle = document.querySelector('.task-title');
+            	const taskText = document.querySelector('.task-text');
             	//console.log(title);
-            	fetch('/multiF', {
+            	fetch('/multiF', { //TODO: написать функцию, по вызову которой происходит fetch с переменным числом параметров
 			method:'POST', 
-			headers: {
-		    	'Content-Type': 'application/json'
-		  	},
-			body: JSON.stringify({
-			id: getCardId(card) 
-			})
-		}).then(response => response.json()).then(data => {title.textContent = data.title; console.log("DATA: " + data);});//Неработает
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({id: getCardId(card)})})
+		.then(
+		response => response.json()).then(
+		data => { title.textContent = data[0].title; textTitle.textContent = data[0].title; taskText.textContent = data[0].description; console.log("DATA: ", data[0]); //почему возвращается массив промисов вместо одного промиса?????
+		})
+		.catch(
+		error => {console.error('Ошибка в response: ', error)}
+		);
 		
+		fetch('/updateTaskField',{
+			method:'POST',
+			headers:{'Content-Type': 'application/json'},
+			body: JSON.stringify({
+			id: getCardId(card),
+			title: textTitle.textContent,
+			description: taskText.textContent
+			})
+		}).then(response => response.json())
+		.then(data => console.log('Response:', data))
+		.catch(error => {console.error('Ошибка в response: ', error)});
+		
+		//TODO: придумать функцию-конструктор запросов, чтобы не копировать бесконечно fetch. 
+		//В аргументы ф-ции будут передаваться параметры fetch, в т.ч. тип запроса GET/POST/т.д.
+		 
 		//card.title.textContent(taskInfo.title);
 		//добавить проверку на изменение таски чтобы не делать лишних fetch
 		//multuF нельзя использовать для обновления тасок(
