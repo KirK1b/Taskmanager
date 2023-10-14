@@ -1,3 +1,4 @@
+ 
   function cardCreate(tasksData){
   const cardList = document.getElementById("cardList"); 
   if (cardList) {
@@ -50,64 +51,57 @@ document.addEventListener('DOMContentLoaded', async function() {
     let tasksData = await response.json();
     cardCreate(tasksData);
   } catch (error) {
-    console.error('Ошибка:', error);
+    console.error('Error:', error);
   }
   
-/*
-Тестовая функция для проверки работы buildDynamicSQLQuery
-*/
- /*async function multiF(user_id, id, title, description, status){
-	 try{ //через нее и получение данных должно работать
-	 if(id === null){
-	 id = "0";
-	 }
-	 if(status === null){
-	 status = "todo";
-	 }
-	 
-	 let response = await fetch('/multiF', {
-						method: 'POST',
-						headers: {
-					    	'Content-Type': 'application/json'
-					  	},
-						body: JSON.stringify({
-						user_id: "1",
-						title: `${title}`,
-						description: `${description}`,
-						status: `${status}`
-						})
-					}
-				);
-		  //let Data = await response.json();
-		  //console.log(Data);
-		  
-	 }catch(error){
-	 console.error('buildDynamicSQLQuery: ', error);
-	 }
- } */
- 
- /* async function getonetask(){
-	  try{
-	  console.log('goonetask');
-	  let response = await fetch('/getOneTask', {
-					method: 'POST',
-					headers: {
-				    	'Content-Type': 'application/json'
-				  	},
-					body: JSON.stringify({
-					user_id: "1" 
-					})
-				}
-			);
-	  let taskData = await response.json();
-	  //console.log(taskData);
-	  return taskData;
-	  //cardCreate(taskData);
-	  } catch (error) {
-	    console.error('Ошибка:', error);
-	  }
-  }  */
+  //cF(/updateTaskField, post, id: getCardId(card), title: this.value)
   
+ 
+  
+  function cF(route ,method, ...data) {
+  const url = `/${route}`; // Замените на URL вашего сервера
+  const options = {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json', 
+    },
+  };
+
+  if (method === 'post') {
+    options.body = JSON.stringify(data);
+  } else if (method === 'get') {
+    // Если нужно передать данные в URL при GET-запросе, то добавьте их здесь
+    // Например: url += `?param1=${data[0]}&param2=${data[1]}`;
+  }
+
+  return fetch(url, options)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+}
+
+/*
+// Пример использования:
+// Для GET-запроса
+cF('get', 'param1', 'param2')
+  .then((data) => {
+    console.log('GET Response:', data);
+  });
+
+// Для POST-запроса
+const postData = { key1: 'value1', key2: 'value2' };
+cF('post', postData)
+  .then((data) => {
+    console.log('POST Response:', data);
+  });
+*/
+
   //часть для кнопки добавления записей
 const addButton = document.querySelector('.add-button');
 // Обработчик события для кнопки "Добавить"
@@ -139,6 +133,16 @@ fetch('/addTasks', {
 	
 });
   
+  //переписать все в document.body.addEventListener('click', () => {});
+  const tTitle = document.querySelector('.task-title');
+  const tText = document.querySelector('.task-text');
+  
+  tTitle.addEventListener('change', (event)=>{
+  argsdata = {}; //как получить id карточки?
+  console.log(argsdata);
+  cF("updateTaskField", 'post'); //"id": `${getCardId(card)}`, "title": `${event.target.value}`
+  });
+  
   //Выбор карточек для удаления
  const cards = document.querySelectorAll('.card');
  let selectedCards = [];
@@ -147,10 +151,14 @@ fetch('/addTasks', {
     
     //короткое нажатие на карточку
         card.addEventListener('click', () => {
+        	//TODO: переместить весь код в блок focusin
+        	//а фокус будет теряться в любом случае при нажатии на текстовое поле. 
+        	//вариант - поделить пополам область фокуса - для тасок и для текста. - нереализуемо.
+        	
          	//при нажатии в любом случае сначала фетчится таска, потом в нее производится запись
             	//два фетча: первый для получения таски, второй для записи.
-            	// 1 - fetch updateTaskFields
-            	//затем - fetch multiF
+            	// 1 - fetch multiF
+            	//затем - fetch uTF
             	
             	const title = card.querySelector('.card-title');
             	const textTitle = document.querySelector('.task-title');
@@ -167,7 +175,10 @@ fetch('/addTasks', {
 		.catch(
 		error => {console.error('Ошибка в response: ', error)}
 		);
-		
+		//обновляем данные в БД
+		//TODO: убрать в change
+		//onchange bool = true;
+		/*
 		fetch('/updateTaskField',{
 			method:'POST',
 			headers:{'Content-Type': 'application/json'},
@@ -179,23 +190,33 @@ fetch('/addTasks', {
 		}).then(response => response.json())
 		.then(data => console.log('Response:', data))
 		.catch(error => {console.error('Ошибка в response: ', error)});
+		*/
 		
-		//TODO: придумать функцию-конструктор запросов, чтобы не копировать бесконечно fetch. 
-		//В аргументы ф-ции будут передаваться параметры fetch, в т.ч. тип запроса GET/POST/т.д.
-		 
+				 
 		//card.title.textContent(taskInfo.title);
 		//добавить проверку на изменение таски чтобы не делать лишних fetch
-		//multuF нельзя использовать для обновления тасок(
-		
-		//boolean изменений к каждой таске, чтобы не вызывать бесконечно fetch
 		
 		//как получить инфу о таске, по которой кликнули?
 		//вариант 1 - передать в качестве аргумента в функцию getonetask слово "id" и сам этот параметр от функции getCardId
 		//если не нужно передавать какой-то параметр, нужно его указать в виде '', однако нужно сделать проверку на пустоту параметра и если он не пустой, добавлять запятую после него в запросе к бд	
 		//если аргумент отсутствует в передаче аргументов функции, т.е. underfined, то делаем замену undefined на ''
-		//вариант 2 - написать новую функцию для этого (геморрой и бред, и так много всего)
         });
+        //TODO: это не будет работать, потому что текстовое поле не является частью карточки
+        /*card.addEventListener('change', () => {
+        fetch('/updateTaskField',{
+			method:'POST',
+			headers:{'Content-Type': 'application/json'},
+			body: JSON.stringify({
+			id: getCardId(card),
+			title: textTitle.textContent,
+			description: taskText.textContent
+			})
+		}).then(response => response.json())
+		.then(data => console.log('Response:', data))
+		.catch(error => {console.error('Ошибка в response: ', error)});
+        });*/
         
+        //TODO: переписать выбор карточек для удаления без добавления в класс "selected"
         //долгое нажатие на карточку - выбор карточек для удаления
         card.addEventListener('mousedown', event => {
         // Запоминаем начальное время нажатия
@@ -244,7 +265,8 @@ document.addEventListener('keydown', (event) => {
   	}	
   }
 });
-        
+//TODO: УБРАТЬ ибо дублирование, + потом будет происходить автоматически.        
+/*
 const title = document.querySelector('.task-title');
 
 title.addEventListener("keydown", (event) => {
@@ -271,15 +293,16 @@ if(document.activeElement === title){
  	}
   }
 });
-  
-
+ 
+*/
+//TODO: при фокусировке на таске сделать выделение ее в виде смены цвета с "утапливанием вглубь"
 //а вот функция focused нужна для определния таски, на которую нажали
   
-//title.addEventListener("focusin", () => {
-//  console.log("focused");
+/*card.addEventListener("focusin", () => {
+  console.log("focused");
   //делается проверка существования в classList элемента focused
   
-//});
+}); */
         //конец domContentLoaded
 }); 
   
