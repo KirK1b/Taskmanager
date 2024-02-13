@@ -68,7 +68,7 @@ class DatabaseHandler {
     });
   }
 
-//WIP -  добавть такую же функцию только для перезаписи тасок
+
   static multiF(data) { //buildDynamicSQLQuery
     let keys = Object.keys(data);
     let values = Object.values(data);
@@ -99,8 +99,8 @@ class DatabaseHandler {
   }
   
   static uTF(data) { //updateTaskFields
-  const keys = Object.keys(data);
-  const values = Object.values(data);
+  let keys = Object.keys(data); 
+  let values = Object.values(data); // const => let
 
   if (keys.length === 0) {
     return Promise.reject("No fields to update.");
@@ -110,7 +110,7 @@ class DatabaseHandler {
   let sqlValues = [];
 
   for (let i = 0; i < keys.length; i++) {
-    if(`${keys[i]}` === 'id')i++;
+    if(`${keys[i]}` === 'id'){i++;}
     sqlQuery += `${keys[i]} = ?`;
     sqlValues.push(values[i]);
 

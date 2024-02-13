@@ -27,6 +27,10 @@
   	}           
   }
 
+
+  //какая-то переменная, в которой хранится id карточки нажатой ранее (или стандартной при загрузке)
+  var CD = 0;
+
   function getCardId(card){
 	  const classList = card.classList;
 		    // Ищем класс, который начинается с "card" и содержит ID
@@ -36,29 +40,12 @@
 		        // Разделяем строку класса для получения ID
 		        const id = idClass.split(':')[1]; // Первый элемент после разделения это ID
 		        console.log(`Нажата карточка с ID: ${id}`);
+		        CD = id;
 		        return id;
 		    }
   }
 
-document.addEventListener('DOMContentLoaded', async function() {
-
-/*
-  Получение тасок при загрузке страницы
-*/
-
-  try {
-    let response = await fetch('/getTasks'); 
-    let tasksData = await response.json();
-    cardCreate(tasksData);
-  } catch (error) {
-    console.error('Error:', error);
-  }
-  
-  //cF(/updateTaskField, post, id: getCardId(card), title: this.value)
-  
- 
-  
-  function cF(route ,method, ...data) {
+function cF(route ,method, ...data) {
   const url = `/${route}`; // Замените на URL вашего сервера
   const options = {
     method: method,
@@ -68,7 +55,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   };
 
   if (method === 'post') {
-    options.body = JSON.stringify(data);
+    options.body = JSON.stringify(data[0]); //options.body = JSON.stringify(data); TODO гребаный МАССИВ в data
+    //console.log(data[0]);
+    console.log(options); //TODO, values in {}, key = NULL
   } else if (method === 'get') {
     // Если нужно передать данные в URL при GET-запросе, то добавьте их здесь
     // Например: url += `?param1=${data[0]}&param2=${data[1]}`;
@@ -102,6 +91,31 @@ cF('post', postData)
   });
 */
 
+
+document.addEventListener('DOMContentLoaded', async function() {
+
+/*
+  Получение тасок при загрузке страницы
+*/
+
+  try {
+    let response = await fetch('/getTasks'); 
+    let tasksData = await response.json();
+    cardCreate(tasksData);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+  
+  //cF(/updateTaskField, post, id: getCardId(card), title: this.value)
+  
+ //по клику добавлять все содержимое? Тупо
+  document.addEventListener('click', (event) => {
+  //console.log(event.target.className);
+  
+  }); 
+  
+
+
   //часть для кнопки добавления записей
 const addButton = document.querySelector('.add-button');
 // Обработчик события для кнопки "Добавить"
@@ -134,14 +148,58 @@ fetch('/addTasks', {
 });
   
   //переписать все в document.body.addEventListener('click', () => {});
+  
+  
+  //если событие инпут, то вызываем задержку, если снова событие, то убираем задержку. Событийная модель? - каждый раз новое событие или нужно ли убирать старые?
   const tTitle = document.querySelector('.task-title');
   const tText = document.querySelector('.task-text');
   
   tTitle.addEventListener('change', (event)=>{
-  argsdata = {}; //как получить id карточки?
-  console.log(argsdata);
-  cF("updateTaskField", 'post'); //"id": `${getCardId(card)}`, "title": `${event.target.value}`
+  //argsdata = {}; //как получить id карточки?
+  console.log(CD);
+  //timerT(event);
+  const postData = { id: CD, title: `${event.target.value}` }; //лишние скобки TODO "[{"id":"77","title":"change"}]"
+  cF("updateTaskField", 'post', postData); //"id": `${getCardId(card)}`, "title": `${event.target.value}`
+    
   });
+  /*
+  let shouldHandleInput = true;
+ //let delay = 1500;
+  function timerT(input){
+  	/*
+  	for (var i = 0; i<=1500; i++){
+		if(input){break; console.log("Break");}
+		delay = delay-i;
+		console.log("wait");
+	}
+	delay = 1500;
+	console.log("done!");
+	*/
+	/*
+	const tt = setTimeout(() => {console.log("done!")}, 1500); 
+	if(input) {clearTimeout(tt); console.log("Break");}
+*/	
+/*
+const a = tTitle.innerText;
+	if (shouldHandleInput) {
+	    
+	    console.log(tTitle.innerText);
+	    shouldHandleInput = false;
+	    setTimeout(function() {
+	      shouldHandleInput = true;
+	    }, 1000);
+	  const b = tTitle.innerText;
+	  if(a===b){console.log("no!");}
+	  else{
+	  console.log("SERVER!");
+	  }
+	  }
+	  
+  }
+  */
+  
+  //TODO: повесить слушателя и на текст
+  
   
   //Выбор карточек для удаления
  const cards = document.querySelectorAll('.card');
@@ -304,6 +362,8 @@ if(document.activeElement === title){
   
 }); */
         //конец domContentLoaded
+
+
 }); 
   
 
