@@ -46,7 +46,7 @@
   }
 
 function cF(route ,method, ...data) {
-  const url = `/${route}`; // Замените на URL вашего сервера
+  const url = `/${route}`;
   const options = {
     method: method,
     headers: {
@@ -105,18 +105,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   } catch (error) {
     console.error('Error:', error);
   }
-  
-  //cF(/updateTaskField, post, id: getCardId(card), title: this.value)
-  
- //по клику добавлять все содержимое? Тупо
-  document.addEventListener('click', (event) => {
-  //console.log(event.target.className);
-  
-  }); 
-  
-
-
-  //часть для кнопки добавления записей
+    
+  //часть для кнопки добавления задач
 const addButton = document.querySelector('.add-button');
 // Обработчик события для кнопки "Добавить"
 addButton.addEventListener('click', () => {
@@ -149,58 +139,71 @@ fetch('/addTasks', {
   
   //переписать все в document.body.addEventListener('click', () => {});
   
-  
+  /*
+  Обновление текста в тасках
+  */
   //если событие инпут, то вызываем задержку, если снова событие, то убираем задержку. Событийная модель? - каждый раз новое событие или нужно ли убирать старые?
+  
+  /*
+  TODO TIMER
+  */
+  
   const tTitle = document.querySelector('.task-title');
   const tText = document.querySelector('.task-text');
   
-  tTitle.addEventListener('change', (event)=>{
-  //argsdata = {}; //как получить id карточки?
-  console.log(CD);
-  //timerT(event);
-  const postData = { id: CD, title: `${event.target.value}` }; //лишние скобки TODO "[{"id":"77","title":"change"}]"
-  cF("updateTaskField", 'post', postData); //"id": `${getCardId(card)}`, "title": `${event.target.value}`
-    
-  });
-  /*
-  let shouldHandleInput = true;
- //let delay = 1500;
-  function timerT(input){
-  	/*
-  	for (var i = 0; i<=1500; i++){
-		if(input){break; console.log("Break");}
-		delay = delay-i;
-		console.log("wait");
-	}
-	delay = 1500;
-	console.log("done!");
-	*/
-	/*
-	const tt = setTimeout(() => {console.log("done!")}, 1500); 
-	if(input) {clearTimeout(tt); console.log("Break");}
-*/	
-/*
-const a = tTitle.innerText;
-	if (shouldHandleInput) {
-	    
-	    console.log(tTitle.innerText);
-	    shouldHandleInput = false;
-	    setTimeout(function() {
-	      shouldHandleInput = true;
-	    }, 1000);
-	  const b = tTitle.innerText;
-	  if(a===b){console.log("no!");}
-	  else{
-	  console.log("SERVER!");
-	  }
-	  }
-	  
+  let typingTimer; // Переменная для хранения таймера
+
+function sendDataToServer(text) {
+if(text === 'title'){
+  const postData = { id: CD, title: `${tTitle.value}` };
+  cF("updateTaskField", 'post', postData); 
+  console.log("Отправка данных на сервер:", postData);
+}
+else{
+  const postData = { id: CD, description: `${tText.value}` };
+  cF("updateTaskField", 'post', postData); 
+  console.log("Отправка данных на сервер:", postData);
   }
+}
+
+tTitle.addEventListener("input", (event) => {
+  // Сбрасываем предыдущий таймер, если он существует
+  clearTimeout(typingTimer);
+
+  // Устанавливаем новый таймер на 5 секунд после последнего ввода
+  typingTimer = setTimeout(function() {
+    // Здесь можно выполнить отправку данных на сервер
+    sendDataToServer('title');
+  }, 700);
+});
+
+tText.addEventListener("input", (event) => {
+  // Сбрасываем предыдущий таймер, если он существует
+  clearTimeout(typingTimer);
+
+  // Устанавливаем новый таймер на 5 секунд после последнего ввода
+  typingTimer = setTimeout(function() {
+    // Здесь можно выполнить отправку данных на сервер
+    sendDataToServer('desc');
+  }, 700);
+});
+
+/*
+End of timer
+*/
+  /*
+  tTitle.addEventListener('change', (event)=>{
+  //console.log(CD);
+  const postData = { id: CD, title: `${event.target.value}` }; //в cF уходит массив из одного элемента
+  cF("updateTaskField", 'post', postData); //"id": `${getCardId(card)}`, "title": `${event.target.value}`  
+  });
+  
+  tText.addEventListener('change', (event)=>{
+  const postData = { id: CD, description: `${event.target.value}` }; //в cF уходит массив из одного элемента
+  console.log(postData);
+  cF("updateTaskField", 'post', postData); //"id": `${getCardId(card)}`, "title": `${event.target.value}`
+  });
   */
-  
-  //TODO: повесить слушателя и на текст
-  
-  
   //Выбор карточек для удаления
  const cards = document.querySelectorAll('.card');
  let selectedCards = [];
@@ -228,7 +231,7 @@ const a = tTitle.innerText;
 			body: JSON.stringify({id: getCardId(card)})})
 		.then(
 		response => response.json()).then(
-		data => { title.textContent = data[0].title; textTitle.textContent = data[0].title; taskText.textContent = data[0].description; console.log("DATA: ", data[0]); //почему возвращается массив промисов вместо одного промиса?????
+		data => { title.textContent = data[0].title; textTitle.textContent = data[0].title; taskText.textContent = data[0].description; console.log("Загрузка текста: ", data[0]); //почему возвращается массив промисов вместо одного промиса?????
 		})
 		.catch(
 		error => {console.error('Ошибка в response: ', error)}
