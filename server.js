@@ -1,4 +1,8 @@
- 
+
+ /*
+Functions block
+*/
+
   function cardCreate(tasksData){
   const cardList = document.getElementById("cardList"); 
   if (cardList) {
@@ -40,7 +44,7 @@
 		        // Разделяем строку класса для получения ID
 		        const id = idClass.split(':')[1]; // Первый элемент после разделения это ID
 		        console.log(`Нажата карточка с ID: ${id}`);
-		        CD = id;
+		        CD = id; //запоминаем id последней нажатой карточки
 		        return id;
 		    }
   }
@@ -55,7 +59,7 @@ function cF(route ,method, ...data) {
   };
 
   if (method === 'post') {
-    options.body = JSON.stringify(data[0]); //options.body = JSON.stringify(data); TODO гребаный МАССИВ в data
+    options.body = JSON.stringify(data[0]); //options.body = JSON.stringify(data); TODO гребаный МАССИВ в data (из-за упаковки в postData)
     //console.log(data[0]);
     console.log(options); //TODO, values in {}, key = NULL
   } else if (method === 'get') {
@@ -89,6 +93,24 @@ cF('post', postData)
   .then((data) => {
     console.log('POST Response:', data);
   });
+*/
+
+//а нужна ли вообще эта функция или достаточно просто писать запрос в cF?
+function sendDataToServer(text, type) {
+if(type === 'title'){
+  const postData = { id: CD, title:  text};
+  cF("updateTaskField", 'post', postData); 
+  console.log("Отправка данных на сервер:", postData);
+}
+else{
+  const postData = { id: CD, description: text };
+  cF("updateTaskField", 'post', postData); 
+  console.log("Отправка данных на сервер:", postData);
+  }
+}
+
+/*
+END of Functions block
 */
 
 
@@ -136,74 +158,44 @@ fetch('/addTasks', {
 			); 
 	
 });
-  
-  //переписать все в document.body.addEventListener('click', () => {});
-  
+    
   /*
   Обновление текста в тасках
   */
   //если событие инпут, то вызываем задержку, если снова событие, то убираем задержку. Событийная модель? - каждый раз новое событие или нужно ли убирать старые?
   
   /*
-  TODO TIMER
+  TIMER
   */
   
   const tTitle = document.querySelector('.task-title');
   const tText = document.querySelector('.task-text');
-  
-  let typingTimer; // Переменная для хранения таймера
-
-function sendDataToServer(text) {
-if(text === 'title'){
-  const postData = { id: CD, title: `${tTitle.value}` };
-  cF("updateTaskField", 'post', postData); 
-  console.log("Отправка данных на сервер:", postData);
-}
-else{
-  const postData = { id: CD, description: `${tText.value}` };
-  cF("updateTaskField", 'post', postData); 
-  console.log("Отправка данных на сервер:", postData);
-  }
-}
+  //Переменные для хранения таймеров
+  let typingTimerTitle; 
+  let typingTimerDesc;
 
 tTitle.addEventListener("input", (event) => {
   // Сбрасываем предыдущий таймер, если он существует
-  clearTimeout(typingTimer);
+  clearTimeout(typingTimerTitle);
 
-  // Устанавливаем новый таймер на 5 секунд после последнего ввода
-  typingTimer = setTimeout(function() {
+  // Устанавливаем новый таймер на 0.7 секунд после последнего ввода
+  typingTimerTitle = setTimeout(function() {
     // Здесь можно выполнить отправку данных на сервер
-    sendDataToServer('title');
+    sendDataToServer(`${tTitle.value}`, 'title');
   }, 700);
 });
 
 tText.addEventListener("input", (event) => {
-  // Сбрасываем предыдущий таймер, если он существует
-  clearTimeout(typingTimer);
-
-  // Устанавливаем новый таймер на 5 секунд после последнего ввода
-  typingTimer = setTimeout(function() {
-    // Здесь можно выполнить отправку данных на сервер
-    sendDataToServer('desc');
+  clearTimeout(typingTimerDesc);
+  typingTimerDesc = setTimeout(function() {
+    sendDataToServer(`${tText.value}`, 'desc');
   }, 700);
 });
 
 /*
 End of timer
 */
-  /*
-  tTitle.addEventListener('change', (event)=>{
-  //console.log(CD);
-  const postData = { id: CD, title: `${event.target.value}` }; //в cF уходит массив из одного элемента
-  cF("updateTaskField", 'post', postData); //"id": `${getCardId(card)}`, "title": `${event.target.value}`  
-  });
-  
-  tText.addEventListener('change', (event)=>{
-  const postData = { id: CD, description: `${event.target.value}` }; //в cF уходит массив из одного элемента
-  console.log(postData);
-  cF("updateTaskField", 'post', postData); //"id": `${getCardId(card)}`, "title": `${event.target.value}`
-  });
-  */
+
   //Выбор карточек для удаления
  const cards = document.querySelectorAll('.card');
  let selectedCards = [];
@@ -231,7 +223,9 @@ End of timer
 			body: JSON.stringify({id: getCardId(card)})})
 		.then(
 		response => response.json()).then(
-		data => { title.textContent = data[0].title; textTitle.textContent = data[0].title; taskText.textContent = data[0].description; console.log("Загрузка текста: ", data[0]); //почему возвращается массив промисов вместо одного промиса?????
+		data => { 
+		title.value = data[0].title; textTitle.value = data[0].title; taskText.value = data[0].description; 
+		console.log("Загрузка текста: ", data[0]); //почему возвращается массив промисов вместо одного промиса?????
 		})
 		.catch(
 		error => {console.error('Ошибка в response: ', error)}
@@ -308,7 +302,7 @@ End of timer
     });
 //доработать, переместить в блок выше        
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Delete') {
+  if (event.key === 'Delete') { //добавить проверку на пустоту массива
   	if(confirm("Удалить таски?")){
   	selectedCards.forEach(selectedCard => {
 	    	fetch('/rmTasks', {
@@ -327,46 +321,17 @@ document.addEventListener('keydown', (event) => {
   }
 });
 //TODO: УБРАТЬ ибо дублирование, + потом будет происходить автоматически.        
-/*
-const title = document.querySelector('.task-title');
 
-title.addEventListener("keydown", (event) => {
-if(document.activeElement === title){
-  if (event.key === 'Enter'){
-  var text = title.textContent;
-  console.log(text);
-  title.blur();
-  //не надо делать в services мультифункцию, нужно просто обращаться по маршруту multiF с нужным набором компонентов fetch
-  fetch('/updateTaskFields', {
-			method: 'POST',
-			headers: {
-		    	'Content-Type': 'application/json'
-		  		},
-			body: JSON.stringify({
-			user_id: "1",
-			id: `${getCardId()}`,
-			title: `${text}`
-			//description: `${}`,
-			//status: ``
-				})
-			}
-		);
- 	}
-  }
-});
- 
-*/
 //TODO: при фокусировке на таске сделать выделение ее в виде смены цвета с "утапливанием вглубь"
-//а вот функция focused нужна для определния таски, на которую нажали
+//а вот функция focused нужна для определения таски, на которую нажали
   
 /*card.addEventListener("focusin", () => {
   console.log("focused");
   //делается проверка существования в classList элемента focused
   
 }); */
+
         //конец domContentLoaded
-
-
 }); 
   
 
