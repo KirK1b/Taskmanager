@@ -1,10 +1,10 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 const dbConfig = {
     host: '0.0.0.0', // Или IP-адрес Docker-контейнера
-    port: '33060',
+    port: '3306',
     user: 'nuser',
-	database: 'task_manager',
+    database: 'task_manager',
     password: '0' // Пароль для MySQL контейнера
 };
 

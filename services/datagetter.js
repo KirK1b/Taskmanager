@@ -1,8 +1,6 @@
 const express = require('express');
 const db = require('../db');
 
-console.log(`Точка запуска скрипта`);
-
 class DatabaseHandler {
   constructor() {
     // Инициализация класса, если необходимо
@@ -23,8 +21,8 @@ class DatabaseHandler {
     });
   }
 
-  static addT(user_id, title, description, status) {
-    const sqlQuery = `INSERT INTO tasks (user_id, title, description, status) VALUES ('${user_id}', '${title}', '${description}', '${status}');`;
+  static addT(user_id, title, description, status, datetime) {
+    const sqlQuery = `INSERT INTO tasks (user_id, title, description, status, lastModified) VALUES ('${user_id}', '${title}', '${description}', '${status}', '${datetime}');`;
 
     return new Promise((resolve, reject) => {
       db.query(sqlQuery, (err, result) => {
@@ -74,7 +72,7 @@ class DatabaseHandler {
     let values = Object.values(data);
 
     let sqlQuery = 'SELECT * FROM tasks WHERE ';
-    let sqlValues = []; //was const
+    let sqlValues = [];
 
     for (let i = 0; i < keys.length; i++) {
       sqlQuery += `${keys[i]} = ?`;
@@ -97,45 +95,45 @@ class DatabaseHandler {
       });
     });
   }
-  
+
   static uTF(data) { //updateTaskFields
-  let keys = Object.keys(data); 
-  let values = Object.values(data); // const => let
+    let keys = Object.keys(data);
+    let values = Object.values(data);
 
-  if (keys.length === 0) {
-    return Promise.reject("No fields to update.");
-  }
-
-  let sqlQuery = 'UPDATE tasks SET ';
-  let sqlValues = [];
-
-  for (let i = 0; i < keys.length; i++) {
-    if(`${keys[i]}` === 'id'){i++;}
-    sqlQuery += `${keys[i]} = ?`;
-    sqlValues.push(values[i]);
-
-    if (i < keys.length - 1) {
-      sqlQuery += ', ';
+    if (keys.length === 0) {
+      return Promise.reject("No fields to update.");
     }
+
+    let sqlQuery = 'UPDATE tasks SET ';
+    let sqlValues = [];
+
+    for (let i = 0; i < keys.length; i++) {
+      if (`${keys[i]}` === 'id') { i++; }
+      sqlQuery += `${keys[i]} = ?`;
+      sqlValues.push(values[i]);
+
+      if (i < keys.length - 1) {
+        sqlQuery += ', ';
+      }
+    }
+
+    sqlQuery += ' WHERE id = ?';
+
+    sqlValues.push(data.id);
+    //console.log(sqlValues);
+    return new Promise((resolve, reject) => {
+      db.query(sqlQuery, sqlValues, (err, results) => {
+        if (err) {
+          console.error("Error executing query:", err);
+          reject(err);
+        } else {
+          //console.log("Update results:", results);
+          resolve(results);
+        }
+      });
+    });
   }
 
-  sqlQuery += ' WHERE id = ?'; 
-
-  sqlValues.push(data.id);
-
-  return new Promise((resolve, reject) => {
-    db.query(sqlQuery, sqlValues, (err, results) => {
-      if (err) {
-        console.error("Error executing query:", err);
-        reject(err);
-      } else {
-        console.log("Update results:", results);
-        resolve(results);
-      }
-    });
-  });
-}
-  
 }
 
 module.exports = DatabaseHandler;
